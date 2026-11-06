@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { createDemoListings } from './listing.seed';
 import { AuthUsersModule } from '../auth-users/auth-users.module';
 import { LISTINGS } from './listings.contract';
 import { LISTING_REPOSITORY, MemoryListingRepository } from './listing.repository';
@@ -11,7 +12,7 @@ import { ListingsService } from './listings.service';
   providers: [
     {
       provide: LISTING_REPOSITORY,
-      useFactory: () => new MemoryListingRepository(),
+      useFactory: () => new MemoryListingRepository(createDemoListings()),
     },
     { provide: LISTINGS, useClass: ListingsService },
   ],
