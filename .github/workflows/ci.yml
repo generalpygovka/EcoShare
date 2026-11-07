@@ -1,0 +1,47 @@
+name: EcoShare checks
+
+permissions:
+  contents: read
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: npm ci
+        working-directory: src/server
+      - run: npm test
+        working-directory: src/server
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: npm ci
+        working-directory: src/client
+      - run: npm run build
+        working-directory: src/client
+
+  schema:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://ecoshare:ecoshare@127.0.0.1:5432/ecoshare?schema=public
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: npx --yes prisma@6.19.0 validate --schema prisma/schema.prisma
