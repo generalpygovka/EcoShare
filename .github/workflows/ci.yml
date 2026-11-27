@@ -44,4 +44,9 @@ jobs:
         with:
           node-version: '24'
           package-manager-cache: false
-      - run: npx --yes prisma@6.19.0 validate --schema prisma/schema.prisma
+      - run: npm ci
+        working-directory: src/server
+      - run: npm run db:validate
+        working-directory: src/server
+      - run: npm run db:generate
+        working-directory: src/server
