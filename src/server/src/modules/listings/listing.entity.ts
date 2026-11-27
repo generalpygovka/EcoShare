@@ -1,4 +1,11 @@
-export type ListingStatus = 'available' | 'reserved' | 'closed' | 'hidden';
+export type ListingStatus =
+  | 'draft'
+  | 'available'
+  | 'reserved'
+  | 'transferred'
+  | 'closed'
+  | 'expired'
+  | 'hidden';
 
 export class Listing {
   public readonly title: string;
