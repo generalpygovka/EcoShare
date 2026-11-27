@@ -16,5 +16,20 @@ services:
       retries: 12
       start_period: 10s
 
+  test-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ecoshare_test
+      POSTGRES_USER: ecoshare
+      POSTGRES_PASSWORD: ecoshare
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ecoshare -d ecoshare_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
 volumes:
   postgres_data:
