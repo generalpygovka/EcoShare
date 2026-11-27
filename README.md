@@ -37,6 +37,46 @@ npm --prefix src/client run dev
 
 Залиш обидва процеси запущеними й відкрий [http://localhost:5173](http://localhost:5173). У стрічці мають з’явитися «Дриль Bosch» і «Книга з програмування». Введи `ДРИЛЬ` і натисни **Знайти** — залишиться одне оголошення.
 
+## PostgreSQL для ЛР5
+
+Початковий `compose.yaml` запускає основну PostgreSQL 17 для локальної розробки.
+Потрібен Docker із підтримкою Linux-контейнерів і Docker Compose. Порт 5432 має бути вільний.
+Поточний API ще використовує пам’ять; підключення модулів до БД виконується наступним етапом.
+
+Із кореня репозиторію:
+
+```bash
+docker compose config --quiet
+docker compose up -d --wait db
+docker compose ps
+```
+
+Сервіс `db` має стати `healthy`. Адреса з ноутбука:
+`postgresql://ecoshare:ecoshare@127.0.0.1:5432/ecoshare?schema=public`.
+Дані доступу демонстраційні, БД опублікована лише на локальному інтерфейсі.
+Адреса вже наведена в `.env.example`; якщо власного `.env` ще немає, створи його як копію цього файла.
+Наявний налаштований `.env` не перезаписуй.
+
+Для підготовки вже доданої схеми й перевірки демонстраційних записів:
+
+```bash
+npm --prefix src/server ci
+npm --prefix src/server run db:generate
+npm --prefix src/server run db:deploy
+npm --prefix src/server run db:seed
+npm --prefix src/server run db:check
+```
+
+Зупинити контейнер можна командою `docker compose stop db`, повторно запустити —
+`docker compose up -d --wait db`. Іменований том `postgres_data` зберігає дані також після
+`docker compose down`. Параметр `--volumes` до `down` видаляє ці дані й не потрібний для звичайної зупинки.
+Повторний `db:seed` відновлює початкові значення демонстраційних записів, тому для перевірки
+збереження власних змін не запускай seed повторно.
+
+Workflow `EcoShare PostgreSQL Compose` перевіряє конфігурацію, запуск БД, міграцію,
+seed і збереження даних після перестворення контейнера в окремому середовищі GitHub Actions.
+Тестова БД `ecoshare_test` і зміни запуску серверних тестів додаються Нікітою окремо.
+
 ## API
 
 Сервер доступний за адресою `http://127.0.0.1:3000`.
