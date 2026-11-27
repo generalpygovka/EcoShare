@@ -9,17 +9,26 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/main.js",
     "dev": "npm run build && npm start",
-    "test": "npm run build && node --test ../../tests/domain.test.cjs ../../tests/api.test.cjs"
+    "test": "npm run build && node --test ../../tests/domain.test.cjs ../../tests/api.test.cjs",
+    "db:validate": "node --env-file-if-exists=../../.env node_modules/prisma/build/index.js validate",
+    "db:generate": "node --env-file-if-exists=../../.env node_modules/prisma/build/index.js generate",
+    "db:migrate": "node --env-file-if-exists=../../.env node_modules/prisma/build/index.js migrate dev --skip-generate",
+    "db:deploy": "node --env-file-if-exists=../../.env node_modules/prisma/build/index.js migrate deploy",
+    "db:seed": "node --env-file-if-exists=../../.env prisma/seed.cjs",
+    "db:check": "node --env-file-if-exists=../../.env prisma/check.cjs"
   },
   "dependencies": {
     "@nestjs/common": "11.2.7",
     "@nestjs/core": "11.2.7",
     "@nestjs/platform-express": "11.2.7",
+    "@prisma/client": "6.19.3",
+    "bcryptjs": "3.0.2",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
   },
   "devDependencies": {
     "@types/node": "22.18.0",
+    "prisma": "6.19.3",
     "typescript": "5.9.3"
   }
 }

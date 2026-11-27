@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  resident
+  moderator
+  admin
+}
+
+enum ListingStatus {
+  draft
+  available
+  reserved
+  transferred
+  closed
+  expired
+  hidden
+}
+
+model Dormitory {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  buildings Building[]
+}
+
+model Building {
+  id          String    @id @default(uuid())
+  name        String
+  dormitoryId String
+  dormitory   Dormitory @relation(fields: [dormitoryId], references: [id], onDelete: Restrict)
+  users       User[]
+  listings    Listing[]
+
+  @@unique([dormitoryId, name])
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  listings Listing[]
+}
+
+model User {
+  id                   String   @id @default(uuid())
+  displayName          String
+  email                String   @unique
+  passwordHash         String
+  contact              String?
+  role                 UserRole @default(resident)
+  active               Boolean  @default(false)
+  blockedUntil         DateTime?
+  notificationsEnabled Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  buildingId           String
+  building             Building @relation(fields: [buildingId], references: [id], onDelete: Restrict)
+  listings             Listing[]
+
+  @@index([buildingId])
+}
+
+model Listing {
+  id             String        @id @default(uuid())
+  title          String
+  description    String
+  quantity       Int           @default(1)
+  condition      String
+  status         ListingStatus @default(available)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  lastActivityAt DateTime      @default(now())
+  ownerId        String
+  categoryId     String
+  buildingId     String
+  owner          User          @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  category       Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  building       Building      @relation(fields: [buildingId], references: [id], onDelete: Restrict)
+  photos         ListingPhoto[]
+
+  @@index([status, createdAt])
+  @@index([categoryId])
+  @@index([buildingId])
+  @@index([ownerId])
+}
+
+model ListingPhoto {
+  id        String   @id @default(uuid())
+  listingId String
+  filePath  String   @unique
+  mimeType  String
+  byteSize  Int
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
