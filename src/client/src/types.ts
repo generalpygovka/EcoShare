@@ -1,10 +1,9 @@
 export interface ListingView {
   id: string;
   title: string;
+  description: string;
   category: string;
   dormitory: string;
-  status: 'Доступно' | 'Заброньовано' | 'Передано';
-  condition: string;
-  description: string;
-  photoUrl?: string;
+  status: 'available' | 'reserved';
+  ownerName: string;
 }
