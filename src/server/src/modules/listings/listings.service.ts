@@ -13,12 +13,7 @@ export class ListingsService implements IListings {
   ) {}
 
   async list(search = ''): Promise<ListingView[]> {
-    const query = search.trim().toLocaleLowerCase('uk');
-
-    const candidates = this.repository.findAll().filter((item) => {
-      const text = (item.title + ' ' + item.description).toLocaleLowerCase('uk');
-      return text.includes(query);
-    });
+    const candidates = await this.repository.findForFeed(search);
 
     const owners = await this.users.findPublicByIds(
       candidates.map((item) => item.ownerId),

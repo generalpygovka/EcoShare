@@ -9,7 +9,7 @@ export class HealthController {
   async check() {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
-      return { status: 'ok', project: 'EcoShare', database: 'ok' };
+      return { status: 'ok', project: 'EcoShare', database: 'ok', storage: 'postgresql'  };
     } catch {
       throw new ServiceUnavailableException('PostgreSQL недоступний');
     }
