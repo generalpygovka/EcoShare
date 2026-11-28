@@ -1,3 +1,4 @@
+
 name: EcoShare checks
 
 permissions:
@@ -10,6 +11,22 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: ecoshare_test
+          POSTGRES_USER: ecoshare
+          POSTGRES_PASSWORD: ecoshare
+        ports:
+          - "5433:5432"
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U ecoshare -d ecoshare_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      TEST_DATABASE_URL: postgresql://ecoshare:ecoshare@127.0.0.1:5433/ecoshare_test?schema=public
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

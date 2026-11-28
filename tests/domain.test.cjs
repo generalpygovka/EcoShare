@@ -17,7 +17,6 @@ const { ListingsService } = require(
     path.join(dist, 'modules/listings/listings.service.js')
 );
 
-// Тест 1. Перевірка наслідування класів
 test('Resident inherits Guest behavior', () => {
     const resident = new Resident(
         'resident-1',
@@ -31,7 +30,6 @@ test('Resident inherits Guest behavior', () => {
     assert.equal(resident.getDisplayName(), 'Олена');
 });
 
-// Тест 2. Перевірка назви оголошення
 test('Listing rejects empty title', () => {
     assert.throws(() => {
         new Listing(
@@ -45,8 +43,7 @@ test('Listing rejects empty title', () => {
     }, /Назва/);
 });
 
-// Тест 3. Робота з підставним репозиторієм
-test('Service works with repository contract', () => {
+test('Service works with repository contract', async () => {
     const repository = {
         findAll() {
             return [
@@ -70,19 +67,22 @@ test('Service works with repository contract', () => {
                 displayName: 'Олена',
                 dormitory: '1'
             };
+        },
+
+        async findPublicByIds(ids) {
+            return ids.map((id) => this.findPublicById(id));
         }
     };
 
     const service = new ListingsService(repository, users);
-    const result = service.list();
+    const result = await service.list();
 
     assert.equal(result.length, 1);
     assert.equal(result[0].title, 'Дриль Bosch');
     assert.equal(result[0].ownerName, 'Олена');
 });
 
-// Тест 4. Перевірка фільтрації станів
-test('Service excludes hidden and closed listings', () => {
+test('Service excludes hidden and closed listings', async () => {
     const statuses = [
         'available',
         'reserved',
@@ -113,11 +113,15 @@ test('Service excludes hidden and closed listings', () => {
                 displayName: 'Олена',
                 dormitory: '1'
             };
+        },
+
+        async findPublicByIds(ids) {
+            return ids.map((id) => this.findPublicById(id));
         }
     };
 
     const service = new ListingsService(repository, users);
-    const result = service.list();
+    const result = await service.list();
 
     assert.deepEqual(
         result.map(item => item.status),
