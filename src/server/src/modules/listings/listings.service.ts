@@ -12,16 +12,22 @@ export class ListingsService implements IListings {
     @Inject(AUTH_USERS) private readonly users: IAuthUsers,
   ) {}
 
-  list(search = ''): ListingView[] {
+  async list(search = ''): Promise<ListingView[]> {
     const query = search.trim().toLocaleLowerCase('uk');
 
-    return this.repository.findAll().flatMap((item) => {
-      if (item.status !== 'available' && item.status !== 'reserved') return [];
-
+    const candidates = this.repository.findAll().filter((item) => {
       const text = (item.title + ' ' + item.description).toLocaleLowerCase('uk');
-      if (query && !text.includes(query)) return [];
+      return text.includes(query);
+    });
 
-      const owner = this.users.findPublicById(item.ownerId);
+    const owners = await this.users.findPublicByIds(
+      candidates.map((item) => item.ownerId),
+    );
+
+    const names = new Map(owners.map((owner) => [owner.id, owner.displayName]));
+
+    return candidates.flatMap((item) => {
+      if (item.status !== 'available' && item.status !== 'reserved') return [];
       return [{
         id: item.id,
         title: item.title,
@@ -29,7 +35,7 @@ export class ListingsService implements IListings {
         category: item.category,
         dormitory: item.dormitory,
         status: item.status,
-        ownerName: owner?.displayName ?? 'Мешканець',
+        ownerName: names.get(item.ownerId) ?? 'Мешканець',
       }];
     });
   }

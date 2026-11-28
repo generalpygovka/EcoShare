@@ -9,7 +9,7 @@ export interface ListingView {
 }
 
 export interface IListings {
-  list(search?: string): ListingView[];
+  list(search?: string): Promise<ListingView[]>;
 }
 
 export const LISTINGS = Symbol('LISTINGS');

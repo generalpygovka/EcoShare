@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, NotFoundException } from '@nestjs/common';
 import { AUTH_USERS } from './auth.contract';
 import type { IAuthUsers } from './auth.contract';
 
@@ -7,7 +7,9 @@ export class AuthUsersController {
   constructor(@Inject(AUTH_USERS) private readonly users: IAuthUsers) {}
 
   @Get('demo')
-  demo() {
-    return this.users.findPublicById('resident-demo');
+  async demo() {
+    const user = await this.users.findPublicById('resident-demo');
+    if (!user) throw new NotFoundException('Демо-користувача не знайдено');
+    return user;
   }
 }
