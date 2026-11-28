@@ -45,7 +45,7 @@ test('Listing rejects empty title', () => {
 
 test('Service works with repository contract', async () => {
     const repository = {
-        findAll() {
+        async findForFeed() {
             return [
                 new Listing(
                     'listing-1',
@@ -91,7 +91,7 @@ test('Service excludes hidden and closed listings', async () => {
     ];
 
     const repository = {
-        findAll() {
+        async findForFeed() {
             return statuses.map((status, index) =>
                 new Listing(
                     `listing-${index}`,
